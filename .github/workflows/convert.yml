@@ -10,7 +10,7 @@ jobs:
   convert:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # Explicitly forces permission to save the folder
+      contents: write
     steps:
       - name: Checkout Code Base
         uses: actions/checkout@v4
@@ -31,4 +31,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "System Auto-Generated: 3D Render Complete"
-          file_pattern: "output_3d/*"
+          file_pattern: "input_2d/**"
