@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - 'input_2d/**'
-  workflow_dispatch: # Allows manual execution from the Actions tab
+  workflow_dispatch:
 
 jobs:
   convert:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Explicitly forces permission to save the folder
     steps:
       - name: Checkout Code Base
         uses: actions/checkout@v4
