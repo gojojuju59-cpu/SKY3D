@@ -15,25 +15,31 @@ jobs:
       - name: Checkout Code Base
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-
-      - name: Install System Video Frameworks
+      - name: Install Video Frameworks
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg libsm6 libxext6
-
-      - name: Install Python Video Dependencies
-        run: |
-          pip install opencv-python numpy
+          sudo apt-get install -y ffmpeg
 
       - name: Execute Conversion Engine
-        run: python converter.py
+        run: |
+          mkdir -p input_2d/output_3d
+          
+          # Find the video file inside the folder
+          VIDEO_FILE=$(find input_2d/ -maxdepth 1 -type f \( -name ".mp4" -o -name ".mkv" -o -name ".MP4" -o -name ".MKV" \) | head -n 1)
+          
+          if [ -z "$VIDEO_FILE" ]; then
+            echo "No video file found inside input_2d folder."
+            exit 1
+          fi
+          
+          FILENAME=$(basename "$VIDEO_FILE")
+          echo "Processing video file: $FILENAME"
+          
+          # Use FFmpeg to shift the right channel and stack side-by-side directly
+          ffmpeg -i "$VIDEO_FILE" -filter_complex "[0:v]split[left][right]; [right]tpad=start_frames=1:stop_mode=clone[right_delayed]; [left][right_delayed]hstack[v]" -map "[v]" -map 0:a? -c:v libx264 -crf 23 -c:a copy "input_2d/output_3d/3D_SBS_$FILENAME"
 
       - name: Commit and Save Finished 3D Movies
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "System Auto-Generated: 3D Render Complete"
-          file_pattern: "input_2d/**"
+          file_pattern: "input_2d/output_3d/*"
