@@ -24,7 +24,7 @@ jobs:
         run: |
           mkdir -p input_2d/output_3d
           
-          # Find the video file inside the folder
+          # Locates your uploaded movie file
           VIDEO_FILE=$(find input_2d/ -maxdepth 1 -type f \( -name ".mp4" -o -name ".mkv" -o -name ".MP4" -o -name ".MKV" \) | head -n 1)
           
           if [ -z "$VIDEO_FILE" ]; then
@@ -35,8 +35,8 @@ jobs:
           FILENAME=$(basename "$VIDEO_FILE")
           echo "Processing video file: $FILENAME"
           
-          # Use FFmpeg to shift the right channel and stack side-by-side directly
-          ffmpeg -i "$VIDEO_FILE" -filter_complex "[0:v]split[left][right]; [right]tpad=start_frames=1:stop_mode=clone[right_delayed]; [left][right_delayed]hstack[v]" -map "[v]" -map 0:a? -c:v libx264 -crf 23 -c:a copy "input_2d/output_3d/3D_SBS_$FILENAME"
+          # Native Side-by-Side Horizontal Stack Filter (No extra plugins needed)
+          ffmpeg -i "$VIDEO_FILE" -filter_complex "[0:v]scale=iw:ih[left]; [0:v]scale=iw:ih[right]; [left][right]hstack[v]" -map "[v]" -map 0:a? -c:v libx264 -crf 23 -c:a copy "input_2d/output_3d/3D_SBS_$FILENAME"
 
       - name: Commit and Save Finished 3D Movies
         uses: stefanzweifel/git-auto-commit-action@v5
