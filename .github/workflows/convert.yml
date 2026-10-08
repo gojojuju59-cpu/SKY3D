@@ -20,9 +20,14 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install System and Video Dependencies
+      - name: Install System Video Frameworks
         run: |
-          pip install opencv-python-headless numpy
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg libsm6 libxext6
+
+      - name: Install Python Video Dependencies
+        run: |
+          pip install opencv-python numpy
 
       - name: Execute Conversion Engine
         run: python converter.py
