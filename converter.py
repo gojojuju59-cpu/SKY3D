@@ -8,7 +8,8 @@ def create_sbs(left_img, right_img):
     return np.hstack((left_img, right_img))
 
 def process_videos():
-    os.makedirs("output_3d", exist_ok=True)
+    # Force creation in the current root workspace directory
+    os.makedirs("./output_3d", exist_ok=True)
     video_files = glob.glob("input_2d/.mp4") + glob.glob("input_2d/.mkv")
     
     if not video_files:
@@ -17,7 +18,7 @@ def process_videos():
 
     for video_path in video_files:
         filename = os.path.basename(video_path)
-        output_path = os.path.join("output_3d", f"3D_SBS_{filename}")
+        output_path = os.path.join("./output_3d", f"3D_SBS_{filename}")
         print(f"Processing: {filename}...")
 
         cap = cv2.VideoCapture(video_path)
@@ -47,5 +48,4 @@ def process_videos():
         out.release()
         print(f"Finished saving to {output_path}")
 
-# Run the converter directly
 process_videos()
