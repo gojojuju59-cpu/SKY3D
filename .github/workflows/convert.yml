@@ -1,0 +1,32 @@
+name: 2D to 3D Automation Converter
+
+on:
+  push:
+    paths:
+      - 'input_2d/**'
+  workflow_dispatch: # Allows manual execution from the Actions tab
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code Base
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install System and Video Dependencies
+        run: |
+          pip install opencv-python-headless numpy
+
+      - name: Execute Conversion Engine
+        run: python converter.py
+
+      - name: Commit and Save Finished 3D Movies
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "System Auto-Generated: 3D Render Complete"
+          file_pattern: "output_3d/*"
